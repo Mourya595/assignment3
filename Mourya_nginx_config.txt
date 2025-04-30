@@ -1,0 +1,31 @@
+#!/bin/bash
+# Update the package list
+sudo yum update -y
+# Install nginx
+sudo yum install nginx -y
+# Start nginx and enable it to run
+sudo systemctl start nginx
+sudo systemctl enable nginx
+# Create two directories for website 1 and 2
+mkdir /usr/share/nginx/site1
+mkdir /usr/share/nginx/site2
+
+#Write a welcome message for the websites
+echo "<html><body><h1> Hello from Site1 </h1></body></html>" | sudo tee  /usr/share/nginx/site1/index.html
+echo "<html><body><h1> Hello from Site2 </h1></body></html>" | sudo tee  /usr/share/nginx/site2/index.html
+
+#Enable the traffic from port 80 for both websites
+echo "server {
+                        listen 80;
+                        server_name site1.mourya.com;
+                        root /usr/share/nginx/site1;
+                      }" | sudo tee /etc/nginx/conf.d/site1.conf
+           echo "server {
+                       listen 80;
+                       server_name site2.mourya.com;
+                       root /usr/share/nginx/site2;
+                     }" | sudo tee /etc/nginx/conf.d/site2.conf
+           # Checking for Syntax errors
+nginx -t
+# Reloading Nginx
+systemctl reload nginx
